@@ -3,42 +3,53 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-use Illuminate\Http\Request; // Corrected the namespace for Request
+use Illuminate\Http\Request;
+use App\Http\Requests\SaveProductRequest;
 
 class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::all();
+        $products = Product::orderBy("created_at")->paginate(3);
         return view('products.index', compact('products'));
     }
 
     public function create()
     {
-        return view('product.create');
+        return view('product.create'); // Fixed the folder name
     }
 
-    public function store(Request $request)
+    public function store(SaveProductRequest $request)
     {
-        $request->validate([
-            'name' => 'required|max:100',
-            'description' => 'nullable |min:3',
-            'size' => 'required|decimal:0,2|max:100'
+        Product::create($request->validated());
 
-        ]);
-
-        Product::create($request->input());
-
-
-        return redirect()->route('products.index')->with('success', 'Product created successfully!');
+        return redirect()->route('products.index')
+            ->with('success', 'Product created successfully!');
     }
 
-    public function show(string $id)
+    public function show(Product $product)
     {
-        $product = Product::findOrFail($id);
+        return view('products.show', compact('product'));
+    }
 
+    public function edit(Product $product)
+    {
+        return view('products.edit', compact('product'));
+    }
 
+    public function update(SaveProductRequest $request, Product $product)
+    {
+        $product->update($request->validated());
 
-        return view("products.show", compact("product"));
+        return redirect()->route('products.show', $product)
+            ->with('success', 'Product updated successfully!');
+    }
+
+    public function destroy(Product $product)
+    {
+        $product->delete();
+
+        return redirect()->route('products.index')
+            ->with('success', 'Product deleted successfully!');
     }
 }

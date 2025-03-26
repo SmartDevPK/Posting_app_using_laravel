@@ -1,12 +1,22 @@
 <!DOCTYPE html>
+<html lang="en">
 
 <head>
-    <title>Larave App</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laravel App</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
 </head>
 
 <body>
-    {{$slot}}
+
+    @if (session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    {{ $slot }}
 
 </body>
 
